@@ -1,0 +1,72 @@
+:root {
+    /* Colors - Warm Earth Theme (Cream & Amber) */
+    --bg-primary: #fffbf7;
+    /* Very light warm cream */
+    --bg-secondary: #f5f0eb;
+    /* Warm stone/beige */
+    --bg-card: #ffffff;
+    /* White */
+
+    --text-primary: #44403c;
+    /* Stone 700 (Warm Dark Gray) */
+    --text-secondary: #78716c;
+    /* Stone 500 */
+    --text-accent: #d97706;
+    /* Amber 600 */
+
+    --primary: #d97706;
+    /* Amber 600 (Warm Gold/Orange) */
+    --primary-glow: rgba(217, 119, 6, 0.3);
+    --secondary: #ecabbb;
+    /* Soft warm pink */
+
+    --border-color: #e7e5e4;
+    /* Stone 200 */
+    --glass-border: rgba(0, 0, 0, 0.05);
+
+    /* Spacing */
+    --space-xs: 0.5rem;
+    --space-sm: 1rem;
+    --space-md: 1.5rem;
+    --space-lg: 2rem;
+    --space-xl: 3rem;
+
+    /* Radius */
+    --radius-sm: 0.5rem;
+    --radius-md: 1rem;
+    --radius-lg: 1.5rem;
+    --radius-full: 9999px;
+
+    /* Typography */
+    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-glow: 0 0 20px var(--primary-glow);
+}
+
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    margin: 0;
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+/* Glassmorphism Utilities */
+.glass-panel {
+    background: var(--bg-card);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-md);
+}
+
+.gradient-text {
+    background: linear-gradient(to right, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}

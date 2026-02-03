@@ -1,0 +1,331 @@
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Noto+Serif+TC:wght@400;700&display=swap');
+
+/* Main Page Container - Reset padding to allow full-width header */
+.memoir-page-root {
+    min-height: 100vh;
+    background-color: var(--bg-primary);
+    padding-bottom: 50px;
+}
+
+.memoir-container {
+    padding: 2rem;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+/* Trip Header Styles (Replicated for consistency) */
+.trip-header {
+    height: 300px;
+    width: 100%;
+    position: relative;
+    background-color: var(--bg-secondary);
+    margin-bottom: 0;
+    /* Remove margin, toolbar sits below */
+}
+
+.trip-header-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.1) 40%, rgba(0, 0, 0, 0.7));
+    display: flex;
+    flex-direction: column;
+    padding: 20px 40px;
+    color: white;
+}
+
+.header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.nav-back-btn,
+.nav-btn {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+.nav-back-btn:hover,
+.nav-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.trip-title-block h1 {
+    font-size: 2.5rem;
+    margin: 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    color: white;
+    /* Ensure title is white */
+}
+
+.trip-title-block p {
+    font-size: 1rem;
+    opacity: 0.9;
+    margin: 5px 0 0 0;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Memoir Toolbar */
+.memoir-toolbar-container {
+    background: white;
+    /* Or var(--bg-secondary) */
+    padding: 1rem;
+    display: flex;
+    justify-content: center;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.memoir-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+/* Dark mode adjustment removed for consistency */
+
+
+.memoir-actions .secondary-button {
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+/* A4 Paper Effect */
+.memoir-paper {
+    background: #fffbf7;
+    /* Rice/Cream paper color */
+    width: 100%;
+    max-width: 210mm;
+    /* A4 width approx */
+    min-height: 297mm;
+    /* A4 height approx */
+    margin: 0 auto;
+    padding: 40px 50px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.05);
+    border-radius: 2px;
+    position: relative;
+    color: #4a4a4a;
+    font-family: 'Noto Serif TC', serif;
+    overflow: hidden;
+}
+
+/* Old Paper Texture Overlay */
+.memoir-paper::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: linear-gradient(to bottom right, rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0));
+    pointer-events: none;
+}
+
+/* Title Section */
+.paper-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    position: relative;
+    border-bottom: 2px double #e0d0c0;
+    padding-bottom: 2rem;
+}
+
+.stamp-decoration {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.5rem;
+    color: #bfa18f;
+    transform: rotate(-5deg);
+    position: absolute;
+    top: -10px;
+    left: 10px;
+    opacity: 0.8;
+}
+
+.paper-title {
+    font-size: 2.5rem;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+    letter-spacing: 2px;
+}
+
+.title-input {
+    font-size: 2rem;
+    text-align: center;
+    background: transparent;
+    border: none;
+    border-bottom: 1px dashed #999;
+    width: 100%;
+    font-family: inherit;
+    color: #2c3e50;
+    /* Ensure visibility */
+}
+
+.paper-meta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: #888;
+    font-style: italic;
+    font-size: 0.9rem;
+}
+
+/* Journal Entries */
+.journal-entries {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.journal-entry {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.entry-date-label {
+    flex-shrink: 0;
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.5rem;
+    color: #e67e22;
+    width: 80px;
+    text-align: right;
+    padding-top: 5px;
+}
+
+.entry-content {
+    flex-grow: 1;
+    font-size: 1.05rem;
+    line-height: 1.8;
+    border-left: 3px solid #f0e6da;
+    padding-left: 1.5rem;
+    white-space: pre-wrap;
+    text-align: justify;
+}
+
+/* Photo Collage (Polaroids) - Overlapping Scrapbook style */
+.photo-collage-section {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0;
+    /* Remove gap to allow overlap */
+    padding: 2rem 1rem;
+    background: transparent;
+    position: relative;
+    margin-top: 1rem;
+}
+
+.collage-item {
+    width: 45%;
+    /* Allow 2 per row on mobile */
+    max-width: 200px;
+    transition: transform 0.3s ease, z-index 0.3s;
+    margin: -10px;
+    /* Negative margin for overlap */
+    position: relative;
+    z-index: 1;
+}
+
+.collage-item:nth-child(even) {
+    transform: rotate(3deg) translateY(10px);
+}
+
+.collage-item:nth-child(odd) {
+    transform: rotate(-3deg) translateY(-5px);
+}
+
+.collage-item:nth-child(3n) {
+    transform: rotate(1deg) scale(0.98);
+    z-index: 2;
+}
+
+.collage-item:hover {
+    transform: scale(1.05) rotate(0deg);
+    z-index: 10;
+}
+
+.polaroid-frame {
+    background: white;
+    padding: 10px 10px 30px 10px;
+    /* Bottom padding for caption space */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.polaroid-frame img {
+    width: 100%;
+    aspect-ratio: 1;
+    /* Square crop */
+    object-fit: cover;
+    display: block;
+    background: #f0f0f0;
+}
+
+.polaroid-caption {
+    margin-top: 10px;
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.1rem;
+    color: #555;
+    text-align: center;
+    width: 100%;
+}
+
+.polaroid-caption-edit {
+    margin-top: 5px;
+    width: 100%;
+    display: flex;
+    gap: 4px;
+}
+
+.polaroid-caption-edit input {
+    flex: 1;
+    border: none;
+    border-bottom: 1px solid #ddd;
+    font-size: 0.8rem;
+    text-align: center;
+    font-family: inherit;
+    background: transparent;
+    color: #333;
+}
+
+.paper-footer {
+    text-align: center;
+    margin-top: 4rem;
+    font-family: 'Dancing Script', cursive;
+    color: #bfa18f;
+    font-size: 1.2rem;
+}
+
+.empty-state-hint {
+    text-align: center;
+    padding: 3rem;
+    color: #999;
+    font-style: italic;
+    border: 2px dashed #eee;
+    margin-top: 2rem;
+    border-radius: 8px;
+}
+
+.memoir-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    color: var(--text-secondary);
+}
