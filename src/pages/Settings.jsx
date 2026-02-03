@@ -23,6 +23,7 @@ export default function Settings() {
 
     // Delete account state
     const [deletePassword, setDeletePassword] = useState('')
+    const [deleteConfirmText, setDeleteConfirmText] = useState('')
     const [deleting, setDeleting] = useState(false)
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
@@ -104,6 +105,12 @@ export default function Settings() {
 
     const handleDeleteAccount = async (e) => {
         e.preventDefault()
+
+        // 驗證確認文字
+        if (deleteConfirmText !== '刪除我的帳號') {
+            alert('請輸入正確的確認文字：刪除我的帳號')
+            return
+        }
 
         // 最後確認
         if (!confirm('⚠️ 最後確認：此操作無法復原，您的所有資料（包括行程、清單、記帳、回憶錄）將永久刪除。確定要繼續嗎？')) {
@@ -308,6 +315,19 @@ export default function Settings() {
                                 />
                             </div>
 
+                            <div className="form-group">
+                                <label>輸入「刪除我的帳號」以確認 *</label>
+                                <input
+                                    type="text"
+                                    value={deleteConfirmText}
+                                    onChange={(e) => setDeleteConfirmText(e.target.value)}
+                                    placeholder="刪除我的帳號"
+                                    required
+                                    disabled={deleting}
+                                />
+                                <small className="form-hint">請完整輸入上方文字以確認刪除</small>
+                            </div>
+
                             <div className="delete-actions">
                                 <button
                                     type="button"
@@ -315,6 +335,7 @@ export default function Settings() {
                                     onClick={() => {
                                         setShowDeleteConfirm(false)
                                         setDeletePassword('')
+                                        setDeleteConfirmText('')
                                     }}
                                     disabled={deleting}
                                 >
