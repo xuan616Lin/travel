@@ -157,6 +157,10 @@ export default function Collaborators({ tripId, ownerId, currentUser }) {
                                     {c.role === 'editor' ? <ShieldAlert size={10} /> : <Shield size={10} />}
                                 </span>
                             </div>
+                            {/* Display Name Below Avatar */}
+                            <span className="member-name">
+                                {c.profiles.full_name || c.profiles.email?.split('@')[0] || 'User'}
+                            </span>
 
                             {/* Dropdown for Owner to managing roles - Show when clicked */}
                             {isOwner && openActionsId === c.id && (
