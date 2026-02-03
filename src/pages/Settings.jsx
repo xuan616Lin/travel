@@ -21,6 +21,11 @@ export default function Settings() {
     const [resetError, setResetError] = useState('')
     const [resetSuccess, setResetSuccess] = useState('')
 
+    // Delete account state
+    const [deletePassword, setDeletePassword] = useState('')
+    const [deleting, setDeleting] = useState(false)
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+
     const handleChangeEmail = async (e) => {
         e.preventDefault()
         setEmailError('')
@@ -94,6 +99,51 @@ export default function Settings() {
             setResetError('發送失敗: ' + error.message)
         } finally {
             setSendingReset(false)
+        }
+    }
+
+    const handleDeleteAccount = async (e) => {
+        e.preventDefault()
+
+        // 最後確認
+        if (!confirm('⚠️ 最後確認：此操作無法復原，您的所有資料（包括行程、清單、記帳、回憶錄）將永久刪除。確定要繼續嗎？')) {
+            return
+        }
+
+        setDeleting(true)
+
+        try {
+            // 1. 驗證密碼
+            const { error: signInError } = await supabase.auth.signInWithPassword({
+                email: user.email,
+                password: deletePassword
+            })
+
+            if (signInError) {
+                alert('密碼驗證失敗，請確認密碼是否正確')
+                setDeleting(false)
+                return
+            }
+
+            // 2. 刪除 profiles (會觸發 CASCADE 刪除所有相關資料)
+            const { error: profileError } = await supabase
+                .from('profiles')
+                .delete()
+                .eq('id', user.id)
+
+            if (profileError) throw profileError
+
+            // 3. 登出並導向登入頁
+            await supabase.auth.signOut()
+
+            alert('✅ 帳號已刪除，感謝您的使用')
+            navigate('/auth')
+
+        } catch (error) {
+            console.error('Delete error:', error)
+            alert('刪除失敗: ' + error.message)
+        } finally {
+            setDeleting(false)
         }
     }
 
@@ -226,6 +276,63 @@ export default function Settings() {
                             </>
                         )}
                     </button>
+                </div>
+
+                <div className="settings-divider" />
+
+                {/* Delete Account - Danger Zone */}
+                <div className="settings-section danger-zone">
+                    <h2>🚨 刪除帳號</h2>
+                    <p className="section-description">
+                        刪除帳號將永久移除您的所有資料，包括行程、清單、記帳、回憶錄等。此操作<strong>無法復原</strong>。
+                    </p>
+
+                    {!showDeleteConfirm ? (
+                        <button
+                            className="danger-toggle-btn"
+                            onClick={() => setShowDeleteConfirm(true)}
+                        >
+                            我要刪除帳號
+                        </button>
+                    ) : (
+                        <form onSubmit={handleDeleteAccount} className="delete-form">
+                            <div className="form-group">
+                                <label>輸入密碼確認身份 *</label>
+                                <input
+                                    type="password"
+                                    value={deletePassword}
+                                    onChange={(e) => setDeletePassword(e.target.value)}
+                                    placeholder="輸入您的密碼"
+                                    required
+                                    disabled={deleting}
+                                />
+                            </div>
+
+                            <div className="delete-actions">
+                                <button
+                                    type="button"
+                                    className="cancel-btn"
+                                    onClick={() => {
+                                        setShowDeleteConfirm(false)
+                                        setDeletePassword('')
+                                    }}
+                                    disabled={deleting}
+                                >
+                                    取消
+                                </button>
+                                <button type="submit" className="danger-button" disabled={deleting}>
+                                    {deleting ? (
+                                        <>
+                                            <Loader2 className="animate-spin" size={20} />
+                                            刪除中...
+                                        </>
+                                    ) : (
+                                        '永久刪除帳號'
+                                    )}
+                                </button>
+                            </div>
+                        </form>
+                    )}
                 </div>
             </div>
         </div>
