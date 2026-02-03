@@ -143,7 +143,7 @@ export default function Checklist({ userRole, collaborators }) {
                         <label><Users size={16} /> 只看</label>
                         <select value={assigneeFilter} onChange={e => setAssigneeFilter(e.target.value)}>
                             <option value="all">所有人</option>
-                            <option value={user?.id}>我的項目</option>
+                            <option value={user?.id}>{user?.user_metadata?.full_name || user?.email?.split('@')[0] || '我'}</option>
                             {collaborators.map(c => (
                                 <option key={c.user_id} value={c.user_id}>
                                     {c.profiles?.full_name}
@@ -196,7 +196,7 @@ export default function Checklist({ userRole, collaborators }) {
                                 className={`assignee-chip ${selectedAssignees.includes(user?.id) ? 'selected' : ''}`}
                                 onClick={() => toggleAssigneeSelection(user?.id)}
                             >
-                                我
+                                {user?.user_metadata?.full_name || user?.email?.split('@')[0] || '我'}
                             </button>
                             {/* Collaborators */}
                             {collaborators.map(c => (
@@ -235,7 +235,7 @@ export default function Checklist({ userRole, collaborators }) {
                                 <div className="item-meta">
                                     {item.assignee && (
                                         <span className="assignee-badge">
-                                            <User size={10} /> {item.assignee.id === user?.id ? '我' : item.assignee.full_name}
+                                            <User size={10} /> {item.assignee.full_name || item.assignee.email?.split('@')[0] || 'Unknown'}
                                         </span>
                                     )}
                                 </div>

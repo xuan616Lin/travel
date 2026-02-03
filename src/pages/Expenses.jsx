@@ -90,9 +90,11 @@ export default function Expenses({ userRole, collaborators }) {
 
     // Helper to get user name
     const getUserName = (userId) => {
-        if (userId === user?.id) return '我'
+        if (userId === user?.id) {
+            return user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Unknown'
+        }
         const c = collaborators.find(c => c.user_id === userId)
-        return c?.profiles?.full_name || 'Unknown'
+        return c?.profiles?.full_name || c?.profiles?.email?.split('@')[0] || 'Unknown'
     }
 
     const handleAddExpense = async (e) => {
@@ -145,7 +147,7 @@ export default function Expenses({ userRole, collaborators }) {
                     <label><Users size={14} /> 付款人</label>
                     <select value={payerFilter} onChange={e => setPayerFilter(e.target.value)}>
                         <option value="all">全部成員</option>
-                        <option value={user?.id}>我</option>
+                        <option value={user?.id}>{user?.user_metadata?.full_name || user?.email?.split('@')[0] || '我'}</option>
                         {collaborators.map(c => (
                             <option key={c.user_id} value={c.user_id}>
                                 {c.profiles?.full_name}
@@ -279,7 +281,7 @@ export default function Expenses({ userRole, collaborators }) {
                                         value={newExpense.payer_id}
                                         onChange={e => setNewExpense({ ...newExpense, payer_id: e.target.value })}
                                     >
-                                        <option value={user?.id}>我</option>
+                                        <option value={user?.id}>{user?.user_metadata?.full_name || user?.email?.split('@')[0] || '我'}</option>
                                         {collaborators.map(c => (
                                             <option key={c.user_id} value={c.user_id}>{c.profiles?.full_name}</option>
                                         ))}
