@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { supabase } from '../lib/supabaseClient'
-import { ArrowLeft, Lock, Loader2, AlertCircle, Mail, Send, CheckCircle } from 'lucide-react'
+import { ArrowLeft, Loader2, AlertCircle, Mail, CheckCircle, Lock } from 'lucide-react'
 import './Settings.css'
 
 export default function Settings() {
@@ -16,10 +16,13 @@ export default function Settings() {
     const [emailError, setEmailError] = useState('')
     const [emailSuccess, setEmailSuccess] = useState('')
 
-    // Password reset state
-    const [sendingReset, setSendingReset] = useState(false)
-    const [resetError, setResetError] = useState('')
-    const [resetSuccess, setResetSuccess] = useState('')
+    // 修改密碼 state
+    const [currentPassword, setCurrentPassword] = useState('')
+    const [newPassword, setNewPassword] = useState('')
+    const [confirmPassword, setConfirmPassword] = useState('')
+    const [changingPassword, setChangingPassword] = useState(false)
+    const [passwordError, setPasswordError] = useState('')
+    const [passwordSuccess, setPasswordSuccess] = useState('')
 
     // Delete account state
     const [deletePassword, setDeletePassword] = useState('')
@@ -82,24 +85,45 @@ export default function Settings() {
         }
     }
 
-    const handleSendPasswordReset = async () => {
-        setResetError('')
-        setResetSuccess('')
-        setSendingReset(true)
+    const handleChangePassword = async (e) => {
+        e.preventDefault()
+        setPasswordError('')
+        setPasswordSuccess('')
 
+        if (newPassword.length < 6) {
+            setPasswordError('新密碼至少需要 6 個字元')
+            return
+        }
+        if (newPassword !== confirmPassword) {
+            setPasswordError('両次輸入的新密碼不一致')
+            return
+        }
+
+        setChangingPassword(true)
         try {
-            const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
-                redirectTo: `${window.location.origin}/reset-password`
+            // 1. 驗證目前密碼
+            const { error: signInError } = await supabase.auth.signInWithPassword({
+                email: user.email,
+                password: currentPassword
             })
+            if (signInError) {
+                setPasswordError('目前密碼驗證失敗，請確認是否正確')
+                setChangingPassword(false)
+                return
+            }
 
+            // 2. 更新新密碼
+            const { error } = await supabase.auth.updateUser({ password: newPassword })
             if (error) throw error
 
-            setResetSuccess('✅ 密碼重設信已發送到您的信箱，請在 5 分鐘內查收並完成重設')
-        } catch (error) {
-            console.error('Password reset error:', error)
-            setResetError('發送失敗: ' + error.message)
+            setPasswordSuccess('✅ 密碼已成功更新')
+            setCurrentPassword('')
+            setNewPassword('')
+            setConfirmPassword('')
+        } catch (err) {
+            setPasswordError('密碼更新失敗: ' + err.message)
         } finally {
-            setSendingReset(false)
+            setChangingPassword(false)
         }
     }
 
@@ -132,18 +156,14 @@ export default function Settings() {
                 return
             }
 
-            // 2. 刪除 profiles (會觸發 CASCADE 刪除所有相關資料)
-            const { error: profileError } = await supabase
-                .from('profiles')
-                .delete()
-                .eq('id', user.id)
+            // 2. 呼叫 delete_account RPC（會同時刪除 auth.users 和所有相關資料）
+            const { error: rpcError } = await supabase.rpc('delete_account')
 
-            if (profileError) throw profileError
+            if (rpcError) throw rpcError
 
             // 3. 登出並導向登入頁
             await supabase.auth.signOut()
-
-            alert('✅ 帳號已刪除，感謝您的使用')
+            alert('✅ 帳號已完整刪除，感謝您的使用')
             navigate('/auth')
 
         } catch (error) {
@@ -245,44 +265,79 @@ export default function Settings() {
 
                 <div className="settings-divider" />
 
-                {/* Password Reset */}
+                {/* Change Password */}
                 <div className="settings-section">
                     <h2>修改密碼</h2>
                     <p className="section-description">
-                        點擊下方按鈕，我們將發送密碼重設連結到您的信箱（⏱️ 5 分鐘內有效）
+                        輸入目前密碼及新密碼以完成變更
                     </p>
 
-                    {resetError && (
-                        <div className="error-message">
-                            <AlertCircle size={16} />
-                            {resetError}
-                        </div>
-                    )}
-
-                    {resetSuccess && (
-                        <div className="success-message">
-                            <CheckCircle size={16} />
-                            {resetSuccess}
-                        </div>
-                    )}
-
-                    <button
-                        className="secondary-button"
-                        onClick={handleSendPasswordReset}
-                        disabled={sendingReset}
-                    >
-                        {sendingReset ? (
-                            <>
-                                <Loader2 className="animate-spin" size={20} />
-                                發送中...
-                            </>
-                        ) : (
-                            <>
-                                <Send size={20} />
-                                發送密碼重設信
-                            </>
+                    <form onSubmit={handleChangePassword}>
+                        {passwordError && (
+                            <div className="error-message">
+                                <AlertCircle size={16} />
+                                {passwordError}
+                            </div>
                         )}
-                    </button>
+                        {passwordSuccess && (
+                            <div className="success-message">
+                                <CheckCircle size={16} />
+                                {passwordSuccess}
+                            </div>
+                        )}
+
+                        <div className="form-group">
+                            <label>目前密碼 *</label>
+                            <input
+                                type="password"
+                                value={currentPassword}
+                                onChange={(e) => setCurrentPassword(e.target.value)}
+                                placeholder="輸入目前密碼"
+                                disabled={changingPassword}
+                                required
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label>新密碼 *</label>
+                            <input
+                                type="password"
+                                value={newPassword}
+                                onChange={(e) => setNewPassword(e.target.value)}
+                                placeholder="輸入新密碼（至少 6 字元）"
+                                disabled={changingPassword}
+                                required
+                                minLength={6}
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label>確認新密碼 *</label>
+                            <input
+                                type="password"
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                placeholder="再次輸入新密碼"
+                                disabled={changingPassword}
+                                required
+                                minLength={6}
+                            />
+                        </div>
+
+                        <button type="submit" className="primary-button" disabled={changingPassword}>
+                            {changingPassword ? (
+                                <>
+                                    <Loader2 className="animate-spin" size={20} />
+                                    更新中...
+                                </>
+                            ) : (
+                                <>
+                                    <Lock size={20} />
+                                    更新密碼
+                                </>
+                            )}
+                        </button>
+                    </form>
                 </div>
 
                 <div className="settings-divider" />

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
 import { useAuth } from '../context/AuthContext'
-import { User, Lock, Mail, Loader2, AlertTriangle } from 'lucide-react'
+import { User, Lock, Mail, Loader2, AlertTriangle, CheckCircle } from 'lucide-react'
 import './Auth.css'
 
 export default function Auth() {
@@ -13,6 +13,13 @@ export default function Auth() {
     const [password, setPassword] = useState('')
     const [loginIdentifier, setLoginIdentifier] = useState('') // Can be email or username
     const [error, setError] = useState(null)
+
+    // 忘記密碼
+    const [forgotPassword, setForgotPassword] = useState(false)
+    const [resetEmail, setResetEmail] = useState('')
+    const [resetLoading, setResetLoading] = useState(false)
+    const [resetMessage, setResetMessage] = useState('')
+    const [resetError, setResetError] = useState('')
 
     const { signIn, signUp } = useAuth()
     const navigate = useNavigate()
@@ -99,112 +106,193 @@ export default function Auth() {
         }
     }
 
+    const handleForgotPassword = async (e) => {
+        e.preventDefault()
+        setResetError('')
+        setResetMessage('')
+        setResetLoading(true)
+        try {
+            const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+                redirectTo: `${window.location.origin}/reset-password`
+            })
+            if (error) throw error
+            setResetMessage('✅ 密碼重設信已發送，請在 5 分鐘內查收並完成重設')
+            setResetEmail('')
+        } catch (err) {
+            setResetError('發送失敗：' + err.message)
+        } finally {
+            setResetLoading(false)
+        }
+    }
+
     return (
         <div className="auth-container">
             <div className="auth-card glass-panel">
-                <h2 className="auth-title gradient-text">{isLogin ? 'Welcome Back' : 'Create Account'}</h2>
+                <h2 className="auth-title gradient-text">
+                    {forgotPassword ? '重設密碼' : (isLogin ? 'Welcome Back' : 'Create Account')}
+                </h2>
                 <p className="auth-subtitle">
-                    {isLogin ? '以 Email 或 暱稱 登入' : '使用 Email 註冊帳號'}
+                    {forgotPassword ? '輸入您的 Email，我們將發送重設連結' : (isLogin ? '以 Email 或 暱稱 登入' : '使用 Email 註冊帳號')}
                 </p>
 
-                {error && <div className="auth-error">{error}</div>}
-
-                {/* Warning for password retention */}
-                <div className="warning-box" style={{
-                    fontSize: '0.85rem',
-                    color: '#fbbf24',
-                    background: 'rgba(251, 191, 36, 0.1)',
-                    padding: '0.8rem',
-                    marginBottom: '1rem',
-                    borderRadius: 'var(--radius-md)',
-                    display: 'flex',
-                    gap: '0.5rem',
-                    alignItems: 'start',
-                    lineHeight: '1.4'
-                }}>
-                    <AlertTriangle size={16} style={{ flexShrink: 0, marginTop: '3px' }} />
-                    <span>請妥善保管您的密碼。</span>
-                </div>
-
-                <form onSubmit={handleSubmit} className="auth-form">
-
-                    {isLogin ? (
-                        // Login Field: Username OR Email
-                        <div className="input-group">
-                            <User className="input-icon" size={20} />
-                            <input
-                                type="text"
-                                placeholder="Email 或 暱稱"
-                                value={loginIdentifier}
-                                onChange={(e) => setLoginIdentifier(e.target.value)}
-                                required
-                                autoFocus
-                            />
+                {/* 忘記密碼模式 */}
+                {forgotPassword ? (
+                    <div className="forgot-password-section">
+                        {resetError && (
+                            <div className="auth-error">{resetError}</div>
+                        )}
+                        {resetMessage ? (
+                            <div className="auth-success">
+                                <CheckCircle size={20} />
+                                {resetMessage}
+                            </div>
+                        ) : (
+                            <form onSubmit={handleForgotPassword} className="auth-form">
+                                <div className="input-group">
+                                    <Mail className="input-icon" size={20} />
+                                    <input
+                                        type="email"
+                                        placeholder="輸入您的 Email"
+                                        value={resetEmail}
+                                        onChange={(e) => setResetEmail(e.target.value)}
+                                        required
+                                        autoFocus
+                                    />
+                                </div>
+                                <button type="submit" className="auth-button" disabled={resetLoading}>
+                                    {resetLoading ? <Loader2 className="animate-spin" /> : '發送重設信'}
+                                </button>
+                            </form>
+                        )}
+                        <div className="auth-footer">
+                            <p>
+                                <button
+                                    type="button"
+                                    className="link-button"
+                                    onClick={() => {
+                                        setForgotPassword(false)
+                                        setResetEmail('')
+                                        setResetMessage('')
+                                        setResetError('')
+                                    }}
+                                >
+                                    ← 返回登入
+                                </button>
+                            </p>
                         </div>
-                    ) : (
-                        <>
-                            {/* Sign Up Fields */}
-                            <div className="input-group">
-                                <Mail className="input-icon" size={20} />
-                                <input
-                                    type="email"
-                                    placeholder="Gmail / Email Address"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    required
-                                />
-                            </div>
-
-                            <div className="input-group">
-                                <User className="input-icon" size={20} />
-                                <input
-                                    type="text"
-                                    placeholder="Username (暱稱 - 唯一識別)"
-                                    value={username}
-                                    onChange={(e) => setUsername(e.target.value)}
-                                    required
-                                    pattern="[a-zA-Z0-9_\-\u4e00-\u9fa5]+"
-                                    title="可以使用中文、英文、數字"
-                                />
-                            </div>
-                        </>
-                    )}
-
-                    <div className="input-group">
-                        <Lock className="input-icon" size={20} />
-                        <input
-                            type="password"
-                            placeholder="Password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                            minLength={6}
-                        />
                     </div>
+                ) : (
+                    <>
+                        {error && <div className="auth-error">{error}</div>}
 
-                    <button type="submit" className="auth-button" disabled={loading}>
-                        {loading ? <Loader2 className="animate-spin" /> : (isLogin ? '登入' : '註冊')}
-                    </button>
-                </form>
+                        {/* Warning for password retention */}
+                        <div className="warning-box" style={{
+                            fontSize: '0.85rem',
+                            color: '#fbbf24',
+                            background: 'rgba(251, 191, 36, 0.1)',
+                            padding: '0.8rem',
+                            marginBottom: '1rem',
+                            borderRadius: 'var(--radius-md)',
+                            display: 'flex',
+                            gap: '0.5rem',
+                            alignItems: 'start',
+                            lineHeight: '1.4'
+                        }}>
+                            <AlertTriangle size={16} style={{ flexShrink: 0, marginTop: '3px' }} />
+                            <span>請妥善保管您的密碼。</span>
+                        </div>
 
-                <div className="auth-footer">
-                    <p>
-                        {isLogin ? "沒有帳號嗎？" : "已有帳號？"}
-                        <button
-                            type="button"
-                            className="link-button"
-                            onClick={() => {
-                                setIsLogin(!isLogin)
-                                setError(null)
-                                setUsername('')
-                                setPassword('')
-                                setEmail('')
-                            }}
-                        >
-                            {isLogin ? '去註冊' : '去登入'}
-                        </button>
-                    </p>
-                </div>
+                        <form onSubmit={handleSubmit} className="auth-form">
+                            {isLogin ? (
+                                <div className="input-group">
+                                    <User className="input-icon" size={20} />
+                                    <input
+                                        type="text"
+                                        placeholder="Email 或 暱稱"
+                                        value={loginIdentifier}
+                                        onChange={(e) => setLoginIdentifier(e.target.value)}
+                                        required
+                                        autoFocus
+                                    />
+                                </div>
+                            ) : (
+                                <>
+                                    <div className="input-group">
+                                        <Mail className="input-icon" size={20} />
+                                        <input
+                                            type="email"
+                                            placeholder="Gmail / Email Address"
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
+                                            required
+                                        />
+                                    </div>
+                                    <div className="input-group">
+                                        <User className="input-icon" size={20} />
+                                        <input
+                                            type="text"
+                                            placeholder="Username (暱稱 - 唯一識別)"
+                                            value={username}
+                                            onChange={(e) => setUsername(e.target.value)}
+                                            required
+                                            pattern="[a-zA-Z0-9_\-\u4e00-\u9fa5]+"
+                                            title="可以使用中文、英文、數字"
+                                        />
+                                    </div>
+                                </>
+                            )}
+
+                            <div className="input-group">
+                                <Lock className="input-icon" size={20} />
+                                <input
+                                    type="password"
+                                    placeholder="Password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    required
+                                    minLength={6}
+                                />
+                            </div>
+
+                            <button type="submit" className="auth-button" disabled={loading}>
+                                {loading ? <Loader2 className="animate-spin" /> : (isLogin ? '登入' : '註冊')}
+                            </button>
+                        </form>
+
+                        <div className="auth-footer">
+                            {isLogin && (
+                                <p>
+                                    <button
+                                        type="button"
+                                        className="link-button"
+                                        onClick={() => {
+                                            setForgotPassword(true)
+                                            setError(null)
+                                        }}
+                                    >
+                                        忘記密碼？
+                                    </button>
+                                </p>
+                            )}
+                            <p>
+                                {isLogin ? "沒有帳號嗎？" : "已有帳號？"}
+                                <button
+                                    type="button"
+                                    className="link-button"
+                                    onClick={() => {
+                                        setIsLogin(!isLogin)
+                                        setError(null)
+                                        setUsername('')
+                                        setPassword('')
+                                        setEmail('')
+                                    }}
+                                >
+                                    {isLogin ? '去註冊' : '去登入'}
+                                </button>
+                            </p>
+                        </div>
+                    </>
+                )}
             </div>
         </div>
     )
