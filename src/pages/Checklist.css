@@ -16,11 +16,8 @@
     padding: 0.8rem 1.5rem;
     border-radius: var(--radius-full);
     border: 1px solid #000;
-    /* Black Border */
     background: white;
-    /* White BG */
     color: #000;
-    /* Black Text */
     font-size: 1rem;
     font-weight: 500;
     cursor: pointer;
@@ -29,9 +26,7 @@
 
 .checklist-tab.active {
     background: #000;
-    /* Black BG */
     color: white;
-    /* White Text */
     border-color: #000;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
@@ -98,11 +93,8 @@
     padding: 0.3rem 0.8rem;
     border-radius: var(--radius-full);
     border: 1px solid #000;
-    /* Black Border */
     background: white;
-    /* White BG */
     color: #000;
-    /* Black Text */
     font-size: 0.85rem;
     cursor: pointer;
     transition: all 0.2s;
@@ -114,13 +106,11 @@
 
 .assignee-chip.selected {
     background: #000;
-    /* Black BG */
     color: white;
-    /* White Text */
     border-color: #000;
 }
 
-/* List Items */
+/* 清單列表 */
 .checklist-list {
     padding: var(--space-md);
     border-radius: var(--radius-lg);
@@ -156,7 +146,6 @@
 
 .checklist-item.checked .check-btn {
     background: #10b981;
-    /* Green */
     border-color: #10b981;
 }
 
@@ -194,6 +183,28 @@
     border-radius: 4px;
 }
 
+/* 操作按鈕群組 */
+.item-actions {
+    display: flex;
+    gap: 0.2rem;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.edit-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0.2rem;
+    border-radius: 4px;
+    transition: color 0.2s;
+}
+
+.edit-btn:hover {
+    color: var(--primary);
+}
+
 .delete-btn {
     background: transparent;
     border: none;
@@ -204,6 +215,95 @@
 
 .delete-btn:hover {
     color: #ef4444;
+}
+
+/* 編輯模式 */
+.checklist-item.editing {
+    flex-direction: column;
+    align-items: stretch;
+    background: rgba(99, 102, 241, 0.05);
+    border-radius: var(--radius-md);
+    padding: 0.8rem;
+}
+
+.edit-mode-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.edit-input {
+    padding: 0.55rem 0.8rem;
+    border-radius: var(--radius-md);
+    border: 1.5px solid var(--primary);
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    outline: none;
+    width: 100%;
+}
+
+.edit-assignee-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+}
+
+.edit-assignee-row select {
+    padding: 0.3rem 0.6rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color);
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.edit-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+}
+
+.save-edit-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.4rem 0.9rem;
+    border-radius: var(--radius-sm);
+    background: var(--primary);
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: background 0.2s;
+}
+
+.save-edit-btn:hover:not(:disabled) {
+    background: #5b5ee0;
+}
+
+.save-edit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.cancel-edit-btn {
+    display: flex;
+    align-items: center;
+    padding: 0.4rem 0.6rem;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.cancel-edit-btn:hover {
+    color: var(--text-primary);
 }
 
 .empty-state {

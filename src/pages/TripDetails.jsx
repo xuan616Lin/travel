@@ -2,13 +2,14 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
 import { useAuth } from '../context/AuthContext'
-import { ArrowLeft, Plus, MapPin, Truck, Utensils, Bed, ExternalLink, Pencil, Trash2, Image as ImageIcon, Camera, Loader2, X, DollarSign, Settings, List, CheckSquare, BookOpen } from 'lucide-react'
+import { ArrowLeft, Plus, MapPin, Truck, Utensils, Bed, ExternalLink, Pencil, Trash2, Image as ImageIcon, Camera, Loader2, X, DollarSign, Settings, List, CheckSquare, BookOpen, StickyNote } from 'lucide-react'
 import { differenceInDays, addDays, format } from 'date-fns'
 import Collaborators from '../components/Collaborators'
 import UserMenu from '../components/UserMenu'
 import Expenses from './Expenses'
 import Checklist from './Checklist'
-import Memoir from './Memoir' // Changed: Import Memoir
+import Notes from './Notes'
+import Memoir from './Memoir'
 import './TripDetails.css'
 
 export default function TripDetails() {
@@ -475,6 +476,12 @@ export default function TripDetails() {
                             <DollarSign size={18} /> 記帳
                         </button>
                         <button
+                            className={`nav-tab-btn ${activeView === 'notes' ? 'active' : ''}`}
+                            onClick={() => setActiveView('notes')}
+                        >
+                            <StickyNote size={18} /> 注意事項
+                        </button>
+                        <button
                             className={`nav-tab-btn ${activeView === 'memoir' ? 'active' : ''}`}
                             onClick={() => setActiveView('memoir')}
                         >
@@ -600,6 +607,10 @@ export default function TripDetails() {
 
                 {activeView === 'expenses' && (
                     <Expenses userRole={userRole} collaborators={collaborators} />
+                )}
+
+                {activeView === 'notes' && (
+                    <Notes userRole={userRole} />
                 )}
 
                 {activeView === 'memoir' && (
